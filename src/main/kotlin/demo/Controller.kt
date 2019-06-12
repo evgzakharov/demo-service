@@ -17,25 +17,30 @@ class DemoController(
 ) {
     @PostMapping
     suspend fun processRequest(@RequestBody serviceRequest: ServiceRequest): Response = coroutineScope {
-//        val authInfo = getAuthInfo(serviceRequest.authToken)
-//
-//        val userInfo = findUser(authInfo.userId)
-//
-//        val cardFromInfo = findCardInfo(serviceRequest.cardFrom)
-//        val cardToInfo = findCardInfo(serviceRequest.cardTo)
-//
-//        sendMoney(cardFromInfo.cardId, cardToInfo.cardId, serviceRequest.amount)
-//
-//        val paymentInfo = getPaymentInfo(cardFromInfo.cardId)
-//
-//        return SuccessResponse(
-//            amount = paymentInfo.currentAmount,
-//            userName = userInfo.name,
-//            userSurname = userInfo.surname,
-//            userAge = userInfo.age
-//        )
+        val userInfoDeferred = async {
+            val authInfo = getAuthInfo(serviceRequest.authToken).awaitFirst()
+            findUser(authInfo.userId).awaitFirst()
+        }
 
-        TODO()
+        val paymentInfoDeferred = async {
+            val cardFromInfoDeferred = async { findCardInfo(serviceRequest.cardFrom).awaitFirst() }
+            val cardToInfoDeferred = async { findCardInfo(serviceRequest.cardTo).awaitFirst() }
+
+            val cardFromInfo = cardFromInfoDeferred.await()
+            sendMoney(cardFromInfo.cardId, cardToInfoDeferred.await().cardId, serviceRequest.amount).awaitFirst()
+
+            getPaymentInfo(cardFromInfo.cardId).awaitFirst()
+        }
+
+        val userInfo = userInfoDeferred.await()
+        val paymentInfo = paymentInfoDeferred.await()
+
+        SuccessResponse(
+            amount = paymentInfo.currentAmount,
+            userName = userInfo.name,
+            userSurname = userInfo.surname,
+            userAge = userInfo.age
+        )
     }
 
     private fun getPaymentInfo(cardId: Long): Mono<PaymentTransactionInfo> {
