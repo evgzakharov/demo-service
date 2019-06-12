@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
+import java.util.concurrent.CompletableFuture
 
 @RestController
 class DemoController(
@@ -15,16 +16,24 @@ class DemoController(
 
     @PostMapping
     fun processRequest(@RequestBody serviceRequest: ServiceRequest): Response {
-        val authInfo = getAuthInfo(serviceRequest.authToken)
+        val authInfoFuture = CompletableFuture.supplyAsync {  getAuthInfo(serviceRequest.authToken) }
+        val userInfoFuture = authInfoFuture.thenApplyAsync { findUser(it.userId) }
 
-        val userInfo = findUser(authInfo.userId)
+        val cardFromInfo = CompletableFuture.supplyAsync { findCardInfo(serviceRequest.cardFrom) }
+        val cardToInfo = CompletableFuture.supplyAsync { findCardInfo(serviceRequest.cardTo) }
 
-        val cardFromInfo = findCardInfo(serviceRequest.cardFrom)
-        val cardToInfo = findCardInfo(serviceRequest.cardTo)
+        val waitAll = CompletableFuture.allOf(cardFromInfo, cardToInfo)
 
-        sendMoney(cardFromInfo.cardId, cardToInfo.cardId, serviceRequest.amount)
+        val paymentInfoFuture = waitAll
+            .thenApplyAsync {
+                sendMoney(cardFromInfo.get().cardId, cardToInfo.get().cardId, serviceRequest.amount)
+            }
+            .thenApplyAsync {
+                getPaymentInfo(cardFromInfo.get().cardId)
+            }
 
-        val paymentInfo = getPaymentInfo(cardFromInfo.cardId)
+        val paymentInfo = paymentInfoFuture.get()
+        val userInfo = userInfoFuture.get()
 
         return SuccessResponse(
             amount = paymentInfo.currentAmount,
