@@ -1,0 +1,9 @@
+server:
+  port: 8080
+
+url:
+  auth: http://localhost:8081
+  card: http://localhost:8082
+  payment: http://localhost:8083
+  user: http://localhost:8084
+
