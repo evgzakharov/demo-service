@@ -1,11 +1,13 @@
 package demo
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.reactive.awaitFirst
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
 import reactor.util.function.Tuple2
 import java.math.BigDecimal
 
@@ -14,37 +16,26 @@ class DemoController(
     private val demoConfig: DemoConfig
 ) {
     @PostMapping
-    fun processRequest(@RequestBody serviceRequest: Mono<ServiceRequest>): Mono<Response> {
-        val cacheRequest = serviceRequest.cache()
-            .publishOn(Schedulers.parallel())
+    suspend fun processRequest(@RequestBody serviceRequest: ServiceRequest): Response = coroutineScope {
+//        val authInfo = getAuthInfo(serviceRequest.authToken)
+//
+//        val userInfo = findUser(authInfo.userId)
+//
+//        val cardFromInfo = findCardInfo(serviceRequest.cardFrom)
+//        val cardToInfo = findCardInfo(serviceRequest.cardTo)
+//
+//        sendMoney(cardFromInfo.cardId, cardToInfo.cardId, serviceRequest.amount)
+//
+//        val paymentInfo = getPaymentInfo(cardFromInfo.cardId)
+//
+//        return SuccessResponse(
+//            amount = paymentInfo.currentAmount,
+//            userName = userInfo.name,
+//            userSurname = userInfo.surname,
+//            userAge = userInfo.age
+//        )
 
-        val userInfoMono = cacheRequest.flatMap {
-            getAuthInfo(it.authToken)
-        }.flatMap {
-            findUser(it.userId)
-        }
-
-        val cardFromInfoMono = cacheRequest.flatMap { findCardInfo(it.cardFrom) }
-        val cardToInfoMono = cacheRequest.flatMap { findCardInfo(it.cardTo) }
-
-        val paymentInfoMono = cardFromInfoMono.zipWith(cardToInfoMono)
-            .flatMap { (cardFromInfo, cardToInfo) ->
-                cacheRequest.flatMap { request ->
-                    sendMoney(cardFromInfo.cardId, cardToInfo.cardId, request.amount).map { cardFromInfo }
-                }
-            }.flatMap {
-                getPaymentInfo(it.cardId)
-            }
-
-        return userInfoMono.zipWith(paymentInfoMono)
-            .map { (userInfo, paymentInfo) ->
-                SuccessResponse(
-                    amount = paymentInfo.currentAmount,
-                    userName = userInfo.name,
-                    userSurname = userInfo.surname,
-                    userAge = userInfo.age
-                )
-            }
+        TODO()
     }
 
     private fun getPaymentInfo(cardId: Long): Mono<PaymentTransactionInfo> {
