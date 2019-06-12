@@ -13,35 +13,25 @@ class DemoController(
 ) {
     private val restTemplate = restTemplateBuilder.build()
 
-    /**
-    {
-     "authToken": "auth-token1",
-     "cardFrom": "55593478",
-     "cardTo": "55592020",
-     "amount": "10.1"
-    }
-
-     p.s. start amount for all cards is 1000
-     */
     @PostMapping
     fun processRequest(@RequestBody serviceRequest: ServiceRequest): Response {
-        //1) get auth info from service by token -> userId
+        val authInfo = getAuthInfo(serviceRequest.authToken)
 
-        //2) find user info by userId from 1.
+        val userInfo = findUser(authInfo.userId)
 
-        //3) 4) find cards info for each card in serviceRequest
+        val cardFromInfo = findCardInfo(serviceRequest.cardFrom)
+        val cardToInfo = findCardInfo(serviceRequest.cardTo)
 
-        // 5) make transaction for known cards by calling sendMoney(id1, id2, amount)
+        sendMoney(cardFromInfo.cardId, cardToInfo.cardId, serviceRequest.amount)
 
-        // 6) after payment get payment info by fromCardId
+        val paymentInfo = getPaymentInfo(cardFromInfo.cardId)
 
-        TODO("return SuccessResponse")
-//        SuccessResponse(
-//            amount = ,
-//            userName = ,
-//            userSurname = ,
-//            userAge =
-//        )
+        return SuccessResponse(
+            amount = paymentInfo.currentAmount,
+            userName = userInfo.name,
+            userSurname = userInfo.surname,
+            userAge = userInfo.age
+        )
     }
 
     private fun getPaymentInfo(cardId: Long): PaymentTransactionInfo {
