@@ -29,7 +29,7 @@ class DemoController(
 //
 //        val paymentInfo = getPaymentInfo(cardFromInfo.cardId)
 //
-//        log.info("resut")
+//        log.info("result")
 //
 //        return SuccessResponse(
 //            amount = paymentInfo.currentAmount,
@@ -38,7 +38,7 @@ class DemoController(
 //            userAge = userInfo.age
 //        )
 
-
+        TODO()
     }
 
     private fun getPaymentInfo(cardId: Long): Mono<PaymentTransactionInfo> {
