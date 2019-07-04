@@ -35,6 +35,8 @@ class DemoController(
         val paymentInfo = paymentInfoFuture.get()
         val userInfo = userInfoFuture.get()
 
+        log.info("result")
+
         return SuccessResponse(
             amount = paymentInfo.currentAmount,
             userName = userInfo.name,
