@@ -11,7 +11,7 @@ import java.math.BigDecimal
 @RestController
 class DemoController(
     private val demoConfig: DemoConfig
-) {
+): ILogging by LoggingImp<DemoController>() {
     @PostMapping
     fun processRequest(@RequestBody serviceRequest: Mono<ServiceRequest>): Mono<Response> {
 //        val authInfo = getAuthInfo(serviceRequest.authToken)
@@ -25,6 +25,8 @@ class DemoController(
 //
 //        val paymentInfo = getPaymentInfo(cardFromInfo.cardId)
 //
+//        log.info("result")
+//
 //        return SuccessResponse(
 //            amount = paymentInfo.currentAmount,
 //            userName = userInfo.name,
@@ -36,6 +38,8 @@ class DemoController(
     }
 
     private fun getPaymentInfo(cardId: Long): Mono<PaymentTransactionInfo> {
+        log.info("getPaymentInfo")
+
         return WebClient.create().get()
             .uri("${demoConfig.payment}/$cardId")
             .retrieve()
@@ -43,6 +47,8 @@ class DemoController(
     }
 
     private fun sendMoney(cardIdFrom: Long, cardIdTo: Long, amount: BigDecimal): Mono<Unit> {
+        log.info("sendMoney")
+
         val paymentRequest = PaymentRequest(cardIdFrom, cardIdTo, amount)
 
         return WebClient.create().post()
@@ -54,6 +60,8 @@ class DemoController(
     }
 
     private fun findCardInfo(cardNumber: String): Mono<CardInfo> {
+        log.info("findCardInfo")
+
         return WebClient.create().get()
             .uri("${demoConfig.card}/$cardNumber")
             .retrieve()
@@ -61,6 +69,8 @@ class DemoController(
     }
 
     private fun findUser(userId: Long): Mono<UserInfo> {
+        log.info("findUser")
+
         return WebClient.create().get()
             .uri("${demoConfig.user}/$userId")
             .retrieve()
@@ -68,6 +78,8 @@ class DemoController(
     }
 
     private fun getAuthInfo(token: String): Mono<AuthInfo> {
+        log.info("getAuthInfo")
+
         return WebClient.create().get()
             .uri("${demoConfig.auth}/$token")
             .retrieve()
