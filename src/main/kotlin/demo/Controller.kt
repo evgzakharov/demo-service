@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
 class DemoController(
     private val demoConfig: DemoConfig,
     restTemplateBuilder: RestTemplateBuilder
-) {
+): ILogging by LoggingImp<DemoController>() {
     private val restTemplate = restTemplateBuilder.build()
 
     @PostMapping
@@ -44,11 +44,15 @@ class DemoController(
     }
 
     private fun getPaymentInfo(cardId: Long): PaymentTransactionInfo {
+        log.info("getPaymentInfo")
+
         return restTemplate.getForEntity("${demoConfig.payment}/{cardId}", PaymentTransactionInfo::class.java, cardId)
             .body ?: throw RuntimeException("couldn't find card info with cardId='$cardId'")
     }
 
     private fun sendMoney(cardIdFrom: Long, cardIdTo: Long, amount: BigDecimal) {
+        log.info("sendMoney")
+
         val paymentRequest = PaymentRequest(cardIdFrom, cardIdTo, amount)
 
         restTemplate.postForEntity(demoConfig.payment, paymentRequest, PaymentSuccessInfo::class.java)
@@ -56,16 +60,22 @@ class DemoController(
     }
 
     private fun findCardInfo(cardNumber: String): CardInfo {
+        log.info("findCardInfo")
+
         return restTemplate.getForEntity("${demoConfig.card}/{cardNumber}", CardInfo::class.java, cardNumber)
             .body ?: throw RuntimeException("couldn't find card with number='$cardNumber'")
     }
 
     private fun findUser(userId: Long): UserInfo {
+        log.info("findUser")
+
         return restTemplate.getForEntity("${demoConfig.user}/{userId}", UserInfo::class.java, userId)
             .body ?: throw RuntimeException("couldn't find user by userId='$userId'")
     }
 
     private fun getAuthInfo(token: String): AuthInfo {
+        log.info("getAuthInfo")
+
         return restTemplate.getForEntity("${demoConfig.auth}/{token}", AuthInfo::class.java, token)
             .body ?: throw RuntimeException("couldn't find user by token='$token'")
     }
