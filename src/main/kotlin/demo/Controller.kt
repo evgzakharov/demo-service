@@ -37,7 +37,7 @@ class DemoController(
         val userInfo = userInfoDeferred.await()
         val paymentInfo = paymentInfoDeferred.await()
 
-        log.info("resut")
+        log.info("result")
 
         SuccessResponse(
             amount = paymentInfo.currentAmount,
