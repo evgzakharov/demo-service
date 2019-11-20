@@ -8,7 +8,7 @@ plugins {
     kotlin("plugin.spring") version kotlinVersion
 
     id("org.springframework.boot") version "2.2.1.RELEASE"
-    id("io.spring.dependency-management") version "1.0.7.RELEASE" 
+    id("io.spring.dependency-management") version "1.0.7.RELEASE"
 }
 
 repositories {
@@ -19,7 +19,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
