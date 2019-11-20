@@ -1,23 +1,18 @@
 package demo
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Configuration
+import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.validation.annotation.Validated
-import javax.validation.constraints.NotNull
+import javax.validation.constraints.Pattern
 
-@Configuration
-@ConfigurationProperties(prefix = "url")
 @Validated
-class DemoConfig {
-    @NotNull
-    lateinit var auth: String
-
-    @NotNull
-    lateinit var card: String
-
-    @NotNull
-    lateinit var payment: String
-
-    @NotNull
-    lateinit var user: String
-}
+@ConstructorBinding
+@ConfigurationProperties(prefix = "url")
+data class DemoConfig(
+    val auth: String,
+    val card: String,
+    val payment: String,
+    val user: String,
+    @Pattern(regexp = "\\d+")
+    val testDigit: String
+)
