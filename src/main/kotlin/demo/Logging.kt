@@ -12,7 +12,7 @@ class LoggingImp(
     override val log: Logger
 ) : ILogging {
     companion object {
-        operator inline fun <reified T> invoke(): LoggingImp {
+        inline operator fun <reified T> invoke(): LoggingImp {
             return LoggingImp(LoggerFactory.getLogger(T::class.java))
         }
     }
