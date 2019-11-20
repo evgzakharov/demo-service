@@ -12,7 +12,5 @@ data class DemoConfig(
     val auth: String,
     val card: String,
     val payment: String,
-    val user: String,
-    @Pattern(regexp = "\\d+")
-    val testDigit: String
+    val user: String
 )
