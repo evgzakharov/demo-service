@@ -8,7 +8,7 @@ plugins {
     kotlin("plugin.spring") version kotlinVersion
 
     id("org.springframework.boot") version "2.2.1.RELEASE"
-    id("io.spring.dependency-management") version "1.0.7.RELEASE" 
+    id("io.spring.dependency-management") version "1.0.7.RELEASE"
 }
 
 repositories {
@@ -32,6 +32,6 @@ tasks.getByName("compileKotlin").dependsOn("processResources")
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict", "-progressive")
-        jvmTarget = "12"
+        jvmTarget = "1.8"
     }
 }
