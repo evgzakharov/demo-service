@@ -16,7 +16,6 @@ class DemoController(
     @PostMapping
     fun processRequest(@RequestBody serviceRequest: Mono<ServiceRequest>): Mono<Response> {
         val cacheRequest = serviceRequest.cache()
-            .publishOn(Schedulers.parallel())
 
         val userInfoMono = cacheRequest.flatMap {
             getAuthInfo(it.authToken)
